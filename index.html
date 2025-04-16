@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>동문 정보 입력</title>
+  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+  <script>
+    Kakao.init("52a00274f64078618fcb4e460b076697");
+
+    function loginWithKakao() {
+      Kakao.Auth.login({
+        success: function(authObj) {
+          Kakao.API.request({
+            url: '/v2/user/me',
+            success: function(res) {
+              document.getElementById("login").style.display = "none";
+              document.getElementById("form").style.display = "block";
+              document.getElementById("kakao_id").value = res.id;
+            }
+          });
+        }
+      });
+    }
+
+    async function submitForm() {
+      const data = {
+        kakao_id: document.getElementById("kakao_id").value,
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        gisu: document.getElementById("gisu").value,
+        gender: document.querySelector('input[name="gender"]:checked').value,
+        address: document.getElementById("address").value,
+        user_agent: navigator.userAgent
+      };
+
+      try {
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbzrzMD6tQ4YmNOmZ5gx3xU39FUOpZbdrORh6-sHfWCS6fZEkPGQtcN5okH3QhLLWLQJuw/exec",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          }
+        );
+        const result = await response.text();
+        alert("제출 완료: " + result);
+      } catch (err) {
+        alert("전송 실패: " + err.message);
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="login">
+    <button onclick="loginWithKakao()">카카오 로그인</button>
+  </div>
+
+  <div id="form" style="display:none;">
+    <input type="hidden" id="kakao_id" />
+    <p>이름: <input type="text" id="name" /></p>
+    <p>전화번호: <input type="text" id="phone" /></p>
+    <p>기수: <input type="text" id="gisu" /></p>
+    <p>성별:
+      <label><input type="radio" name="gender" value="남" checked /> 남</label>
+      <label><input type="radio" name="gender" value="여" /> 여</label>
+    </p>
+    <p>주소: <input type="text" id="address" /></p>
+    <button onclick="submitForm()">제출</button>
+  </div>
+</body>
+</html>
